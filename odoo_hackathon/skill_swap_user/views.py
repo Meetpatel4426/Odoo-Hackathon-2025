@@ -1,17 +1,14 @@
 # skill_swap_user/views.py
 from django.shortcuts import render, redirect
-from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .forms import RegistrationFormStep1, RegistrationFormStep2, LoginForm, OptionalDetailsForm
-from .models import UserProfile
+from django.contrib.auth.hashers import make_password, check_password
+from .models import CustomUser, UserDetails
+from .forms import RegistrationFormStep1, RegistrationFormStep2, LoginForm
+from django.contrib.auth.decorators import login_required
 
-
-# Step 1: Register view (multi-step)
 def register_view(request):
     step = request.POST.get("step", "1")
-    
+
     if request.method == 'POST' and step == "1":
         form = RegistrationFormStep1(request.POST)
         if form.is_valid():
@@ -19,23 +16,22 @@ def register_view(request):
             return render(request, 'skill_swap_user/register_step2.html', {
                 'form': RegistrationFormStep2(),
             })
+
     elif request.method == 'POST' and step == "2":
         session_data = request.session.get('register_data')
         if not session_data:
             return redirect('register')
 
         form = RegistrationFormStep2(request.POST)
-        if form.is_valid() or request.POST.get('skip'):  # Allow skip
+        if form.is_valid() or request.POST.get('skip'):
             try:
-                user = User.objects.create_user(
-                    username=session_data['email'],
+                user = CustomUser.objects.create(
+                    name=session_data['name'],
                     email=session_data['email'],
-                    password=session_data['password'],
-                    first_name=session_data['name'],
+                    password=make_password(session_data['password']),
                 )
-                # Save optional data if not skipped
                 if not request.POST.get('skip'):
-                    profile = UserProfile.objects.create(
+                    UserDetails.objects.create(
                         user=user,
                         location=form.cleaned_data.get('location', ''),
                         phone_number=form.cleaned_data.get('phone_number', ''),
@@ -51,40 +47,44 @@ def register_view(request):
     else:
         form = RegistrationFormStep1()
 
-    return render(request, 'skill_swap_user/register.html', {
-        'form': form
-    })
+    return render(request, 'skill_swap_user/register.html', {'form': form})
 
 
-# Login View
 def login_view(request):
     error = None
     if request.method == 'POST':
         email = request.POST.get('username')
         password = request.POST.get('password')
-        user = authenticate(request, username=email, password=password)
-        if user:
-            login(request, user)
-            return redirect('profile')
-        else:
-            error = "Invalid email or password"
+
+        try:
+            user = CustomUser.objects.get(email=email)
+            if check_password(password, user.password):
+                request.session['user_id'] = user.id  # Manual login via session
+                return redirect('profile')
+            else:
+                error = "Invalid credentials"
+        except CustomUser.DoesNotExist:
+            error = "Invalid credentials"
+
     return render(request, 'skill_swap_user/login.html', {'error': error})
 
 
-# Forgot Password View (Placeholder)
 def forgot_password_view(request):
     return render(request, 'skill_swap_user/forgot_password.html')
 
 
-# Profile View (Login required)
-@login_required
 def profile_view(request):
-    profile = None
+    user_id = request.session.get('user_id')
+    if not user_id:
+        return redirect('login')
+    
     try:
-        profile = UserProfile.objects.get(user=request.user)
-    except UserProfile.DoesNotExist:
-        pass
+        user = CustomUser.objects.get(id=user_id)
+        profile = getattr(user, 'details', None)
+    except CustomUser.DoesNotExist:
+        return redirect('login')
+
     return render(request, 'skill_swap_user/profile.html', {
-        'user': request.user,
+        'user': user,
         'profile': profile
     })

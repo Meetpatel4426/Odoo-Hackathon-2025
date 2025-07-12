@@ -1,9 +1,8 @@
 # skill_swap_user/forms.py
 from django import forms
-from django.contrib.auth.models import User
+from .models import CustomUser
 import re
 
-# Step 1: Basic Registration Form
 class RegistrationFormStep1(forms.Form):
     name = forms.CharField(max_length=100, required=True)
     email = forms.EmailField(required=True)
@@ -12,13 +11,12 @@ class RegistrationFormStep1(forms.Form):
 
     def clean_email(self):
         email = self.cleaned_data['email']
-        if User.objects.filter(email=email).exists():
+        if CustomUser.objects.filter(email=email).exists():
             raise forms.ValidationError("Email already exists.")
         return email
 
     def clean_password(self):
         password = self.cleaned_data.get('password')
-        # Enforce at least 8 characters, one uppercase, one lowercase, one number, one special char
         pattern = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$'
         if not re.match(pattern, password):
             raise forms.ValidationError(
@@ -34,7 +32,6 @@ class RegistrationFormStep1(forms.Form):
         if password and confirm_password and password != confirm_password:
             self.add_error('confirm_password', "Passwords do not match.")
 
-# Step 2: Optional Details
 class RegistrationFormStep2(forms.Form):
     location = forms.CharField(required=False, max_length=150)
     phone_number = forms.CharField(required=False, max_length=20)
@@ -43,13 +40,6 @@ class RegistrationFormStep2(forms.Form):
     skills_required = forms.CharField(required=False, widget=forms.Textarea(attrs={'rows': 3}))
     availability = forms.CharField(required=False, help_text="e.g., Weekends, Evenings")
 
-# Login Form (Optional but recommended for flexibility)
 class LoginForm(forms.Form):
     username = forms.EmailField()
     password = forms.CharField(widget=forms.PasswordInput)
-
-# Profile update form (for future use)
-class OptionalDetailsForm(forms.ModelForm):
-    class Meta:
-        model = User
-        fields = ['first_name', 'email']

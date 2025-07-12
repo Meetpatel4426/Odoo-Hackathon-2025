@@ -122,7 +122,19 @@ STATICFILES_DIRS = [
 ]
 
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # For testing
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'swap.skill.mailsender@gmail.com'
+EMAIL_HOST_PASSWORD = 'vdmdticjzcibgoce'  
+DEFAULT_FROM_EMAIL = 'SkillSwap <swap.skill.mailsender@gmail.com>'
+
+AUTH_USER_MODEL = 'skill_swap_user.CustomUser'
+
+# Session expires after 15 minutes of inactivity
+SESSION_COOKIE_AGE = 900  # 900 seconds = 15 minutes
+SESSION_SAVE_EVERY_REQUEST = True
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

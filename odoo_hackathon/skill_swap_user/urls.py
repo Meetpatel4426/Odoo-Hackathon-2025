@@ -3,10 +3,24 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('register/', views.register_view, name='register'),
+    # Auth
     path('', views.login_view, name='login'),
+    path('register/', views.register_view, name='register'),
     path('forgot-password/', views.forgot_password_view, name='forgot_password'),
-    path('profile/', views.profile_view, name='profile'),
     path('reset/<uidb64>/<token>/', views.reset_password_confirm, name='password_reset_confirm'),
     path('logout/', views.logout_view, name='logout'),
+
+    # Profile
+    path('profile/', views.profile_view, name='profile'),
+
+    # Search public users by skill
+    path('search/', views.search_users, name='search_users'),
+
+    # Swap Requests
+    path('send-request/<int:receiver_id>/', views.send_swap_request, name='send_swap_request'),
+    path('requests/', views.manage_requests, name='manage_requests'),
+    path('requests/<int:request_id>/<str:action>/', views.update_request_status, name='update_request_status'),
+
+    # Feedback
+    path('feedback/<int:swap_id>/', views.leave_feedback, name='leave_feedback'),
 ]

@@ -1,0 +1,36 @@
+{% extends "skill_swap_user/base.html" %}
+{% block content %}
+<h2>Swap Requests</h2>
+
+<h3>Received Requests</h3>
+<ul>
+  {% for swap in received %}
+  <li>
+    From: {{ swap.sender.name }} – Offers: {{ swap.skill_offered }} | Wants: {{ swap.skill_required }} | Status: {{ swap.status }}
+    {% if swap.status == 'pending' %}
+      <a href="{% url 'update_request_status' swap.id 'accept' %}">Accept</a>
+      <a href="{% url 'update_request_status' swap.id 'reject' %}">Reject</a>
+    {% endif %}
+    {% if swap.status == 'accepted' and not swap.feedback %}
+      <a href="{% url 'leave_feedback' swap.id %}">Leave Feedback</a>
+    {% endif %}
+  </li>
+  {% empty %}
+  <li>No received requests.</li>
+  {% endfor %}
+</ul>
+
+<h3>Sent Requests</h3>
+<ul>
+  {% for swap in sent %}
+  <li>
+    To: {{ swap.receiver.name }} – Offers: {{ swap.skill_offered }} | Wants: {{ swap.skill_required }} | Status: {{ swap.status }}
+    {% if swap.status == 'pending' %}
+      <a href="{% url 'update_request_status' swap.id 'delete' %}">Delete</a>
+    {% endif %}
+  </li>
+  {% empty %}
+  <li>No sent requests.</li>
+  {% endfor %}
+</ul>
+{% endblock %}

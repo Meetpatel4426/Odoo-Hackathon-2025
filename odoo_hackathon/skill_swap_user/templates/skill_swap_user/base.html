@@ -1,0 +1,16 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Skill Swap Platform</title>
+  </head>
+  <body>
+    {% csrf_token %} {% if messages %} {% for msg in messages %}
+    <p
+      style="color: {% if msg.tags == 'success' %}green{% else %}red{% endif %};"
+    >
+      {{ msg }}
+    </p>
+    {% endfor %} {% endif %} {% block content %}{% endblock %}
+  </body>
+</html>

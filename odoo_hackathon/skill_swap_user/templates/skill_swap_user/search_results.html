@@ -1,0 +1,22 @@
+{% extends "skill_swap_user/base.html" %}
+{% block content %}
+<h2>Search by Skill</h2>
+<form method="get">
+  <input type="text" name="q" placeholder="Enter skill…" value="{{ query }}" />
+  <button type="submit">Search</button>
+</form>
+
+{% if results %}
+<ul>
+  {% for detail in results %}
+  <li>
+    <a href="{% url 'send_swap_request' detail.user.id %}">
+      <strong>{{ detail.user.name }}</strong> – offers: {{ detail.skills_offered|truncatechars:50 }}
+    </a>
+  </li>
+  {% endfor %}
+</ul>
+{% elif query %}
+<p>No public profiles found for "{{ query }}".</p>
+{% endif %}
+{% endblock %}

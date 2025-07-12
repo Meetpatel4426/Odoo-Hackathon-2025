@@ -1,0 +1,7 @@
+{% extends "skill_swap_user/base.html" %} {% block content %}
+<h2>Send Swap Request</h2>
+<form method="post">
+  {% csrf_token %} {{ form.as_p }}
+  <button type="submit">Send Request</button>
+</form>
+{% endblock %}

@@ -1,23 +1,17 @@
-{% load static %}
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>Profile</title>
-  </head>
-  <body>
-    <h2>Welcome, {{ user.first_name }}</h2>
-    <p>Email: {{ user.email }}</p>
+{% extends "skill_swap_user/base.html" %} {% load static %} {% block content %}
+<h1>Profile Page</h1>
+{% if user.is_authenticated %}
+<p>Welcome, {{ user.username }}!</p>
+<h2>Your Profile</h2>
+<p>Name: {{ user.name }}</p>
+<p>Email: {{ user.email }}</p>
 
-    {% if profile %}
-    <p><strong>Location:</strong> {{ profile.location }}</p>
-    <p><strong>Phone:</strong> {{ profile.phone_number }}</p>
-    <p><strong>Profession:</strong> {{ profile.current_profession }}</p>
-    <p><strong>Skills Offered:</strong> {{ profile.skills_offered }}</p>
-    <p><strong>Skills Required:</strong> {{ profile.skills_required }}</p>
-    <p><strong>Availability:</strong> {{ profile.availability }}</p>
-    {% else %}
-    <p>No additional profile data.</p>
-    {% endif %}
-    <p><a href="{% url 'logout' %}">Logout</a></p>
-  </body>
-</html>
+<form method="post">
+  {% csrf_token %} {{ form.as_p }}
+  <button type="submit">Update Profile <span>(optional)</span></button>
+</form>
+
+<p><a href="{% url 'search_users' %}">Search Users</a></p>
+<p><a href="{% url 'manage_requests' %}">Manage Swap Requests</a></p>
+<p><a href="{% url 'logout' %}">Logout</a></p>
+{% endif %} {% endblock %}

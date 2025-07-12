@@ -25,7 +25,9 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
-
+    class Meta:
+        verbose_name = "User"
+        verbose_name_plural = "Users"
     objects = CustomUserManager()
 
     USERNAME_FIELD = 'email'                    # for login
@@ -43,6 +45,33 @@ class UserDetails(models.Model):
     skills_offered = models.TextField(blank=True)
     skills_required = models.TextField(blank=True)
     availability = models.CharField(max_length=100, blank=True)
+    profile_visibility = models.CharField(
+    max_length=10,
+        choices=[('public', 'Public'), ('private', 'Private')],
+    default='public'
+    )
 
     def __str__(self):
         return f"Details of {self.user.email}"
+
+class SwapRequest(models.Model):
+    sender = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='sent_requests')
+    receiver = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='received_requests')
+    skill_offered = models.CharField(max_length=100)
+    skill_required = models.CharField(max_length=100)
+    message = models.TextField(blank=True)
+    status = models.CharField(max_length=20, choices=[
+        ('pending', 'Pending'),
+        ('accepted', 'Accepted'),
+        ('rejected', 'Rejected')
+    ], default='pending')
+    created_at = models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+        return f"{self.sender.email} → {self.receiver.email} ({self.status})"
+
+class Feedback(models.Model):
+    swap = models.OneToOneField(SwapRequest, on_delete=models.CASCADE)
+    rating = models.IntegerField()
+    comment = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+

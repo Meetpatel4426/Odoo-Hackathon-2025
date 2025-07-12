@@ -1,7 +1,32 @@
 {% extends "skill_swap_user/base.html" %} {% block content %}
-<h2>Send Swap Request</h2>
+<h2>Send Swap Request to {{ receiver.name }}</h2>
+
+<p><strong>Email:</strong> {{ receiver.email }}</p>
+
 <form method="post">
-  {% csrf_token %} {{ form.as_p }}
+  {% csrf_token %}
+
+  <label for="id_skill_offered">Your Skill to Offer:</label>
+  <select name="skill_offered" id="id_skill_offered" required>
+    {% for skill in sender_skills %}
+    <option value="{{ skill }}">{{ skill }}</option>
+    {% endfor %}
+  </select>
+  <br /><br />
+
+  <label for="id_skill_required"
+    >Skill You Want from {{ receiver.name }}:</label
+  >
+  <select name="skill_required" id="id_skill_required" required>
+    {% for skill in receiver_skills %}
+    <option value="{{ skill }}">{{ skill }}</option>
+    {% endfor %}
+  </select>
+  <br /><br />
+
+  {{ form.message.label_tag }} {{ form.message }}
+
+  <br />
   <button type="submit">Send Request</button>
 </form>
 {% endblock %}

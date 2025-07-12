@@ -1,6 +1,6 @@
 # odoo_hackathon/skill_swap_user/forms.py
 from django import forms
-from .models import CustomUser, UserDetails, SwapRequest, Feedback
+from .models import CustomUser, UserDetails, SwapRequest, Feedback, ChatMessage 
 import re
 
 # Step 1: Basic Registration Form
@@ -64,12 +64,11 @@ class UpdateUserDetailsForm(forms.ModelForm):
             'skills_required': forms.Textarea(attrs={'rows': 3}),
         }
 
-
-# Step 5: Swap Request Form
+# Step 5: Swap Request Form (no receiver field - it's passed via view)
 class SwapRequestForm(forms.ModelForm):
     class Meta:
         model = SwapRequest
-        fields = ['receiver', 'skill_offered', 'skill_required', 'message']
+        fields = ['skill_offered', 'skill_required', 'message']
         widgets = {
             'message': forms.Textarea(attrs={'rows': 2}),
         }
@@ -82,4 +81,12 @@ class FeedbackForm(forms.ModelForm):
         fields = ['rating', 'comment']
         widgets = {
             'comment': forms.Textarea(attrs={'rows': 2}),
+        }
+
+class ChatMessageForm(forms.ModelForm):
+    class Meta:
+        model = ChatMessage
+        fields = ['message']
+        widgets = {
+            'message': forms.Textarea(attrs={'rows': 2, 'placeholder': 'Type your message...'}),
         }

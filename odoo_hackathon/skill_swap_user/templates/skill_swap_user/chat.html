@@ -1,0 +1,46 @@
+{% block content %}
+<h2>
+  Chat with {{ swap.receiver.name if current_user == swap.sender else
+  swap.sender.name }}
+</h2>
+
+<div
+  id="chat-box"
+  style="
+    border: 1px solid #ccc;
+    padding: 10px;
+    max-height: 300px;
+    overflow-y: scroll;
+  "
+>
+  <p>Loading messages...</p>
+</div>
+
+<form method="post" style="margin-top: 15px">
+  {% csrf_token %} {{ form.as_p }}
+  <button type="submit">Send</button>
+</form>
+<a href="{% url 'manage_requests' %}">Back to Requests</a>
+
+<script>
+  function loadMessages() {
+    fetch("{% url 'chat_messages_api' swap.id %}")
+      .then((response) => response.json())
+      .then((data) => {
+        const chatBox = document.getElementById("chat-box");
+        chatBox.innerHTML = "";
+        data.messages.forEach((msg) => {
+          const p = document.createElement("p");
+          p.innerHTML = `<strong>${msg.sender}:</strong> ${msg.message} <br><small style="color: gray">${msg.timestamp}</small>`;
+          chatBox.appendChild(p);
+        });
+        chatBox.scrollTop = chatBox.scrollHeight;
+      });
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    loadMessages();
+    setInterval(loadMessages, 1000);
+  });
+</script>
+{% endblock %}

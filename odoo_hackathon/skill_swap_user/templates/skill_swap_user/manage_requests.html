@@ -6,13 +6,19 @@
 <ul>
   {% for swap in received %}
   <li>
-    From: {{ swap.sender.name }} – Offers: {{ swap.skill_offered }} | Wants: {{ swap.skill_required }} | Status: {{ swap.status }}
+    From: {{ swap.sender.name }} –
+    Offers: {{ swap.skill_offered }} |
+    Wants: {{ swap.skill_required }} |
+    Status: {{ swap.status }}
+
     {% if swap.status == 'pending' %}
       <a href="{% url 'update_request_status' swap.id 'accept' %}">Accept</a>
       <a href="{% url 'update_request_status' swap.id 'reject' %}">Reject</a>
-    {% endif %}
-    {% if swap.status == 'accepted' and not swap.feedback %}
-      <a href="{% url 'leave_feedback' swap.id %}">Leave Feedback</a>
+    {% elif swap.status == 'accepted' %}
+      <a href="{% url 'chat' swap.id %}">Chat</a>
+      {% if not swap.feedback %}
+        <a href="{% url 'leave_feedback' swap.id %}">Leave Feedback</a>
+      {% endif %}
     {% endif %}
   </li>
   {% empty %}
@@ -24,9 +30,18 @@
 <ul>
   {% for swap in sent %}
   <li>
-    To: {{ swap.receiver.name }} – Offers: {{ swap.skill_offered }} | Wants: {{ swap.skill_required }} | Status: {{ swap.status }}
+    To: {{ swap.receiver.name }} –
+    Offers: {{ swap.skill_offered }} |
+    Wants: {{ swap.skill_required }} |
+    Status: {{ swap.status }}
+
     {% if swap.status == 'pending' %}
       <a href="{% url 'update_request_status' swap.id 'delete' %}">Delete</a>
+    {% elif swap.status == 'accepted' %}
+      <a href="{% url 'chat' swap.id %}">Chat</a>
+      {% if not swap.feedback %}
+        <a href="{% url 'leave_feedback' swap.id %}">Leave Feedback</a>
+      {% endif %}
     {% endif %}
   </li>
   {% empty %}

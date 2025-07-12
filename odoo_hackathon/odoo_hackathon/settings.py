@@ -117,11 +117,10 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-STATICFILES_DIRS = [
-    BASE_DIR / 'skill_swap_user/static',
-]
+STATICFILES_DIRS = [BASE_DIR / 'skill_swap_user'/'static']
 
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587

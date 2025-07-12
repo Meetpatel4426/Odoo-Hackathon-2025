@@ -8,12 +8,14 @@ from django.template.loader import render_to_string
 from django.core.mail import EmailMultiAlternatives
 from django.utils import timezone
 from datetime import timedelta
+from django.http import JsonResponse
 
 from .models import CustomUser, UserDetails, SwapRequest, Feedback
 from .forms import (
     RegistrationFormStep1, RegistrationFormStep2,
-    LoginForm, UpdateUserDetailsForm, SwapRequestForm, FeedbackForm
+    LoginForm, UpdateUserDetailsForm, SwapRequestForm, FeedbackForm, ChatMessageForm
 )
+from .models import CustomUser, UserDetails, SwapRequest, Feedback, ChatMessage 
 from .utils import password_reset_token
 
 
@@ -201,26 +203,46 @@ def search_users(request):
 
 
 # ---------------- Send Swap Request ----------------
-def send_swap_request(request, receiver_id):
+def send_swap_request(request, user_id):
     if check_session_timeout(request) or not request.session.get('user_id'):
         return redirect('login')
 
     sender = get_object_or_404(CustomUser, id=request.session['user_id'])
-    receiver = get_object_or_404(CustomUser, id=receiver_id)
+    receiver = get_object_or_404(CustomUser, id=user_id)
+
+    sender_profile = UserDetails.objects.filter(user=sender).first()
+    receiver_profile = UserDetails.objects.filter(user=receiver).first()
+
+    if not sender_profile or not receiver_profile:
+        messages.error(request, "Both users must have completed their profile to swap skills.")
+        return redirect('search_users')
+
+    sender_skills = [skill.strip() for skill in sender_profile.skills_offered.split(',') if skill.strip()]
+    receiver_skills = [skill.strip() for skill in receiver_profile.skills_offered.split(',') if skill.strip()]
 
     if request.method == 'POST':
-        form = SwapRequestForm(request.POST)
-        if form.is_valid():
-            swap = form.save(commit=False)
-            swap.sender = sender
-            swap.receiver = receiver
-            swap.save()
-            messages.success(request, "Swap request sent.")
-            return redirect('profile')
-    else:
-        form = SwapRequestForm()
+        skill_offered = request.POST.get('skill_offered')
+        skill_required = request.POST.get('skill_required')
+        message = request.POST.get('message')
 
-    return render(request, 'skill_swap_user/send_request.html', {'form': form})
+        if skill_offered not in sender_skills or skill_required not in receiver_skills:
+            messages.error(request, "Invalid skill selection.")
+        else:
+            SwapRequest.objects.create(
+                sender=sender,
+                receiver=receiver,
+                skill_offered=skill_offered,
+                skill_required=skill_required,
+                message=message,
+            )
+            messages.success(request, f"Swap request sent to {receiver.name}.")
+            return redirect('manage_requests')
+
+    return render(request, 'skill_swap_user/send_request.html', {
+        'receiver': receiver,
+        'sender_skills': sender_skills,
+        'receiver_skills': receiver_skills,
+    })
 
 
 # ---------------- Manage Swap Requests ----------------
@@ -266,3 +288,54 @@ def leave_feedback(request, swap_id):
         form = FeedbackForm()
 
     return render(request, 'skill_swap_user/feedback.html', {'form': form})
+
+def chat_view(request, swap_id):
+    if check_session_timeout(request) or not request.session.get('user_id'):
+        return redirect('login')
+
+    swap = get_object_or_404(SwapRequest, id=swap_id, status='accepted')
+    user = get_object_or_404(CustomUser, id=request.session['user_id'])
+
+    if user != swap.sender and user != swap.receiver:
+        return redirect('profile')  # prevent unauthorized access
+
+    if request.method == 'POST':
+        form = ChatMessageForm(request.POST)
+        if form.is_valid():
+            message = form.save(commit=False)
+            message.swap = swap
+            message.sender = user
+            message.save()
+            return redirect('chat', swap_id=swap_id)
+    else:
+        form = ChatMessageForm()
+
+    messages_qs = ChatMessage.objects.filter(swap=swap)
+
+    return render(request, 'skill_swap_user/chat.html', {
+        'form': form,
+        'messages': messages_qs,
+        'swap': swap,
+        'current_user': user
+    })
+
+def chat_messages_api(request, swap_id):
+    if check_session_timeout(request) or not request.session.get('user_id'):
+        return JsonResponse({'error': 'Unauthorized'}, status=401)
+
+    swap = get_object_or_404(SwapRequest, id=swap_id, status='accepted')
+    user = get_object_or_404(CustomUser, id=request.session['user_id'])
+
+    if user != swap.sender and user != swap.receiver:
+        return JsonResponse({'error': 'Forbidden'}, status=403)
+
+    messages_qs = ChatMessage.objects.filter(swap=swap).order_by('timestamp')
+    data = [
+        {
+            'sender': msg.sender.name,
+            'message': msg.message,
+            'timestamp': msg.timestamp.strftime('%H:%M %d-%m-%Y')
+        }
+        for msg in messages_qs
+    ]
+    return JsonResponse({'messages': data})

@@ -75,3 +75,15 @@ class Feedback(models.Model):
     comment = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
+class ChatMessage(models.Model):
+    swap = models.ForeignKey(SwapRequest, on_delete=models.CASCADE, related_name='messages')
+    sender = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    message = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['timestamp']  # messages will be ordered chronologically
+
+    def __str__(self):
+        return f"Message from {self.sender.email} at {self.timestamp}"
+

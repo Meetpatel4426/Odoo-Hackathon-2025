@@ -1,0 +1,22 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Profile</title>
+  </head>
+  <body>
+    <h2>Welcome, {{ user.first_name }}</h2>
+    <p>Email: {{ user.email }}</p>
+
+    {% if profile %}
+    <p><strong>Location:</strong> {{ profile.location }}</p>
+    <p><strong>Phone:</strong> {{ profile.phone_number }}</p>
+    <p><strong>Profession:</strong> {{ profile.current_profession }}</p>
+    <p><strong>Skills Offered:</strong> {{ profile.skills_offered }}</p>
+    <p><strong>Skills Required:</strong> {{ profile.skills_required }}</p>
+    <p><strong>Availability:</strong> {{ profile.availability }}</p>
+    {% else %}
+    <p>No additional profile data.</p>
+    {% endif %}
+  </body>
+</html>

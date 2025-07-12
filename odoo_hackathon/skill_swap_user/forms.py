@@ -1,5 +1,7 @@
+# skill_swap_user/forms.py
 from django import forms
 from django.contrib.auth.models import User
+import re
 
 # Step 1: Basic Registration Form
 class RegistrationFormStep1(forms.Form):
@@ -13,6 +15,17 @@ class RegistrationFormStep1(forms.Form):
         if User.objects.filter(email=email).exists():
             raise forms.ValidationError("Email already exists.")
         return email
+
+    def clean_password(self):
+        password = self.cleaned_data.get('password')
+        # Enforce at least 8 characters, one uppercase, one lowercase, one number, one special char
+        pattern = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$'
+        if not re.match(pattern, password):
+            raise forms.ValidationError(
+                "Password must be at least 8 characters long and include at least one uppercase letter, "
+                "one lowercase letter, one number, and one special character."
+            )
+        return password
 
     def clean(self):
         cleaned_data = super().clean()

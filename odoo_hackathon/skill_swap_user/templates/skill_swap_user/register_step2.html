@@ -1,0 +1,37 @@
+<!-- templates/skill_swap_user/register_step2.html -->
+<!DOCTYPE html>
+{% load static %}
+<html>
+  <head>
+    <title>Register - Step 2</title>
+    <link
+      rel="stylesheet"
+      href="{% static 'skill_swap_user/css/style.css' %}"
+    />
+  </head>
+  <body>
+    <h2>Optional Info (Step 2)</h2>
+    <form method="post">
+      {% csrf_token %}
+      <input type="hidden" name="step" value="2" />
+      {{ form.as_p }}
+      <button type="submit">Submit</button>
+    </form>
+    <form method="post" action="{% url 'register' %}">
+      {% csrf_token %}
+      <input type="hidden" name="step" value="2" />
+      <button
+        type="submit"
+        style="
+          background: none;
+          border: none;
+          color: blue;
+          text-decoration: underline;
+          cursor: pointer;
+        "
+      >
+        Skip
+      </button>
+    </form>
+  </body>
+</html>

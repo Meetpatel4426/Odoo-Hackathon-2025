@@ -1,0 +1,25 @@
+/* static/skill_swap_user/css/style.css */
+body {
+    font-family: Arial, sans-serif;
+    margin: 2rem;
+    background-color: #f9f9f9;
+}
+
+h2 {
+    color: #333;
+}
+
+form {
+    margin-top: 1rem;
+    background: #fff;
+    padding: 1rem;
+    border: 1px solid #ddd;
+    max-width: 400px;
+}
+
+input, select, textarea {
+    width: 100%;
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+}

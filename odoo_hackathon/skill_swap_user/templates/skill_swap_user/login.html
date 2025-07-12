@@ -1,0 +1,37 @@
+<!-- templates/skill_swap_user/login.html -->
+<!DOCTYPE html>
+{% load static %}
+<html>
+  <head>
+    <title>Login</title>
+    <link
+      rel="stylesheet"
+      href="{% static 'skill_swap_user/css/style.css' %}"
+    />
+  </head>
+  <body>
+    <h2>Login</h2>
+    {% if error %}
+    <p style="color: red">{{ error }}</p>
+    {% endif %}
+    <form method="post">
+      {% csrf_token %}
+      <p>
+        <input type="text" name="username" placeholder="Username" required />
+      </p>
+      <p>
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          required
+        />
+      </p>
+      <button type="submit">Login</button>
+    </form>
+    <p><a href="{% url 'forgot_password' %}">Forgot Password?</a></p>
+    <p>
+      Don't have an account? <a href="{% url 'register' %}">Register here</a>
+    </p>
+  </body>
+</html>

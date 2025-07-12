@@ -1,0 +1,20 @@
+<!-- templates/skill_swap_user/register.html -->
+<!DOCTYPE html>
+{% load static %}
+<html>
+  <head>
+    <title>Register - Step 1</title>
+    <link
+      rel="stylesheet"
+      href="{% static 'skill_swap_user/css/style.css' %}"
+    />
+  </head>
+  <body>
+    <h2>Register - Step 1</h2>
+    <form method="post">
+      {% csrf_token %} {{ form.as_p }}
+      <button type="submit">Next</button>
+    </form>
+    <p>Already have an account? <a href="{% url 'login' %}">Login here</a></p>
+  </body>
+</html>

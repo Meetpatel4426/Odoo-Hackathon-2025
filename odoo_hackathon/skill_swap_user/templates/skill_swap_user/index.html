@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Skill Swap - Home</title>
+</head>
+<body>
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'skill_swap_user/css/index.css' %}" />
+
+  <!-- Navigation -->
+  <div class="navbar">
+    <div class="nav-left">SkillSwap</div>
+    <div class="nav-right">
+      <a href="#">Home</a>
+      <a href="#">Explore</a>
+      <a href="#">My Profile</a>
+    </div>
+  </div>
+
+  <div class="container">
+
+    <!-- Top Bar: Search + Profile Icon -->
+    <div class="top-bar">
+      <form class="search-wrapper" method="GET" action="">
+        <img src="https://cdn-icons-png.flaticon.com/512/622/622669.png" alt="Search" class="search-icon" />
+        <input type="text" name="q" placeholder="Search by name or skill..." />
+      </form>
+
+      <a href="my_profile.html">
+        <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="Profile" class="profile-icon" />
+      </a>
+    </div>
+
+    <!-- Heading -->
+    <h1>Our Skill Swappers</h1>
+
+    <!-- User Card 1 -->
+    <div class="profile-card">
+      <img src="https://via.placeholder.com/120" class="profile-photo" alt="User Photo" />
+      <div class="profile-info">
+        <h2>Anjali Patel</h2>
+        <p>Frontend developer passionate about clean code and user experiences.</p>
+        <div class="skills">
+          <p>Skills:</p>
+          <div class="tags">
+            <span>HTML</span>
+            <span>CSS</span>
+            <span>JavaScript</span>
+          </div>
+        </div>
+        <button class="request-btn">Request Skill</button>
+      </div>
+    </div>
+
+    <!-- User Card 2 -->
+    <div class="profile-card">
+      <img src="https://via.placeholder.com/120/0000FF/ffffff?text=Ravi" class="profile-photo" alt="User Photo" />
+      <div class="profile-info">
+        <h2>Ravi Sharma</h2>
+        <p>Photographer and visual storyteller with 5+ years of experience.</p>
+        <div class="skills">
+          <p>Skills:</p>
+          <div class="tags">
+            <span>Photography</span>
+            <span>Lightroom</span>
+            <span>Editing</span>
+          </div>
+        </div>
+        <button class="request-btn">Request Skill</button>
+      </div>
+    </div>
+
+    <!-- Add more user cards as needed -->
+
+  </div>
+  <!-- 🧠 Admin Suggestion Panel -->
+<div id="suggestion-panel">
+  <div id="suggestion-header">
+    <h4>Latest News</h4>
+    <button id="close-btn">&times;</button>
+  </div>
+  <div id="suggestion-content" id="typed-output">
+    Loading suggestions...
+  </div>
+</div>
+
+<script>
+const suggestions = [
+  "💡 Don't forget to update your profile picture!",
+  "🎯 Add more skills to improve visibility.",
+  "🚀 Skill Swap sessions happen every Friday!",
+  "🧠 You can endorse others for their skills.",
+  "📢 Use the search bar to find matching skill partners."
+];
+
+let index = 0;
+const content = document.getElementById("suggestion-content");
+
+function typeMessage(message, i = 0) {
+  if (i < message.length) {
+    content.innerHTML += message.charAt(i);
+    setTimeout(() => typeMessage(message, i + 1), 30);
+  } else {
+    setTimeout(() => {
+      content.innerHTML = "";
+      index = (index + 1) % suggestions.length;
+      typeMessage(suggestions[index]);
+    }, 2500);
+  }
+}
+
+typeMessage(suggestions[index]);
+
+// Close button
+document.getElementById("close-btn").addEventListener("click", () => {
+  document.getElementById("suggestion-panel").classList.add("hidden");
+});
+
+// Working resize-on-drag
+const panel = document.getElementById("suggestion-panel");
+const header = document.getElementById("suggestion-header");
+
+let isDragging = false;
+let startY = 0;
+let startHeight = 0;
+
+header.addEventListener("mousedown", function(e) {
+  isDragging = true;
+  startY = e.clientY;
+  startHeight = panel.offsetHeight;
+  document.body.style.cursor = 'ns-resize';
+  document.body.style.userSelect = 'none';
+});
+
+document.addEventListener("mousemove", function(e) {
+  if (!isDragging) return;
+  const dy = startY - e.clientY;
+  const newHeight = startHeight + dy;
+  if (newHeight >= 60 && newHeight <= 400) {
+    panel.style.height = newHeight + "px";
+  }
+});
+
+document.addEventListener("mouseup", function() {
+  isDragging = false;
+  document.body.style.cursor = '';
+  document.body.style.userSelect = '';
+});
+</script>
+>
+
+</body>
+</html>

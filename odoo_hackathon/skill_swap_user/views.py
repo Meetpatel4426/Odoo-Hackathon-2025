@@ -16,6 +16,8 @@ from .forms import (
 )
 from .utils import password_reset_token
 
+def index(request):
+    return render(request, 'skill_swap_user/index.html')
 
 # ---------------- Registration ----------------
 def register_view(request):

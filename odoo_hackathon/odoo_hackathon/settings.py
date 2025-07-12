@@ -136,6 +136,12 @@ AUTH_USER_MODEL = 'skill_swap_user.CustomUser'
 SESSION_COOKIE_AGE = 900  # 900 seconds = 15 minutes
 SESSION_SAVE_EVERY_REQUEST = True
 
+import os
+# Media files
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'skill_swap_user/media')
+
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 

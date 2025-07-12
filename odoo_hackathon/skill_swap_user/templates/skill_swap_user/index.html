@@ -50,7 +50,7 @@
       <!-- Heading -->
       <h1>Our Skill Swappers</h1>
 
-      {% for user_detail in users %}
+      {% for user in users %}
       <div class="profile-card">
         <img
           src="https://via.placeholder.com/120"
@@ -58,17 +58,17 @@
           alt="User Photo"
         />
         <div class="profile-info">
-          <h2>{{ user_detail.name }}</h2>
-          <p>{{ user_detail.bio|default:"No bio available." }}</p>
+          <h2>{{ user.name }}</h2>
+          <p>{{ user.bio|default:"No bio available." }}</p>
           <div class="skills">
             <p>Skills:</p>
             <div class="tags">
-              {% comment %} {% for skill in user_detail.skills|split:", " %}
+              {% for skill in user.skills %}
               <span>{{ skill }}</span>
-              {% endfor %} {% endcomment %}
+              {% endfor %}
             </div>
           </div>
-          <a href="{% url 'send_swap_request' user_detail.user.id %}">
+          <a href="{% url 'send_swap_request' user.id %}">
             <button class="request-btn">Request Skill</button>
           </a>
         </div>

@@ -19,37 +19,35 @@ from .models import CustomUser, UserDetails, SwapRequest, Feedback, ChatMessage
 from .utils import password_reset_token
 
 def home_view(request):
-    # Session-based authentication check
     if not request.session.get('user_id'):
-        return redirect('login')  # Redirect to your login page if not logged in
+        return redirect('login')
 
-    # Optional search query
     query = request.GET.get('q', '').strip()
 
-    # Get all public profiles except the currently logged-in user
     users = UserDetails.objects.filter(
         user__is_active=True,
         profile_visibility='public'
     ).exclude(user_id=request.session['user_id'])
 
-    # # Search filtering by name or skill
-    # if query:
-    #     users = users.filter(
-    #         Q(name__icontains=query) |
-    #         Q(skills__icontains=query)
-    #     )
+    user_list = []
+    for u in users:
+        skill_list = [s.strip() for s in u.skills_offered.split(',') if s.strip()]
+        user_list.append({
+            'id': u.user.id,
+            'name': u.user.name,  
+            'bio': u.current_profession,
+            'skills': skill_list,
+        })
 
-    # Optionally, fetch current logged-in user's details
     try:
         current_user = UserDetails.objects.get(user_id=request.session['user_id'])
     except UserDetails.DoesNotExist:
         current_user = None
 
-    context = {
-        'users': users,
+    return render(request, 'skill_swap_user/index.html', {
+        'users': user_list,
         'current_user': current_user
-    }
-    return render(request, 'skill_swap_user/index.html', context)
+    })
 
 # ---------------- Registration ----------------
 def register_view(request):
@@ -102,7 +100,7 @@ def login_view(request):
             if check_password(password, user.password):
                 request.session['user_id'] = user.id
                 request.session['last_activity'] = timezone.now().isoformat()
-                return redirect('profile')
+                return redirect('home')
             else:
                 error = "Invalid credentials"
         except CustomUser.DoesNotExist:

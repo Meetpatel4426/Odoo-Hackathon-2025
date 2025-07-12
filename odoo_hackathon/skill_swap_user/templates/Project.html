@@ -1,0 +1,68 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Skill Swap - Profile Page</title>
+  <link rel="stylesheet" href="{% static 'skill_swap_user/css/style.css' %}">
+</head>
+<body>
+  <div class="container">
+    <h1>User Profile</h1>
+
+    <div class="profile-card">
+      <div class="profile-info">
+        <h2 id="userName">Marc Demo</h2>
+
+        <div class="skills">
+          <p><strong>Skills Offered:</strong></p>
+          <div class="tags" id="skillsOffered"></div>
+        </div>
+
+        <div class="skills">
+          <p><strong>Skills Wanted:</strong></p>
+          <div class="tags" id="skillsWanted"></div>
+        </div>
+
+        <div class="rating">
+          <p><strong>Rating:</strong> <span id="rating">4.8</span> / 5</p>
+          <p id="feedback">Very helpful and skilled communicator.</p>
+        </div>
+      </div>
+      <img src="media/profile.jpg" alt="Profile Photo" class="profile-photo" />
+
+    </div>
+
+    <button class="request-btn" onclick="openModal()">Request</button>
+  </div>
+
+  <!-- Modal -->
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <h3>Swap Request</h3>
+
+      <label for="yourSkill">Choose one of your offered skills:</label>
+      <select id="yourSkill">
+        <option>Guitar</option>
+        <option>Spanish</option>
+        <option>Photoshop</option>
+      </select>
+
+      <label for="wantedSkill">Choose one of their wanted skills:</label>
+      <select id="wantedSkill">
+        <option>Coding</option>
+        <option>Cooking</option>
+      </select>
+
+      <label for="message">Message:</label>
+      <textarea id="message" rows="4" placeholder="Write a message..."></textarea>
+
+      <button class="submit-btn" onclick="submitRequest()">Submit</button>
+    </div>
+  </div>
+
+  <script src="{% static 'skill_swap_user/css/script.js' %}"></script>
+</body>
+</html>

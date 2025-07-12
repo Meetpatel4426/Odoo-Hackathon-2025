@@ -3,6 +3,10 @@
 <html>
   <head>
     <title>Skill Swap Platform</title>
+    <link
+      rel="stylesheet"
+      href="{% static 'skill_swap_user/css/style.css' %}"
+    />
   </head>
   <body>
     {% csrf_token %} {% if messages %} {% for msg in messages %}

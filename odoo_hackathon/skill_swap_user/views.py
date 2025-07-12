@@ -18,6 +18,38 @@ from .forms import (
 from .models import CustomUser, UserDetails, SwapRequest, Feedback, ChatMessage 
 from .utils import password_reset_token
 
+def home_view(request):
+    # Session-based authentication check
+    if not request.session.get('user_id'):
+        return redirect('login')  # Redirect to your login page if not logged in
+
+    # Optional search query
+    query = request.GET.get('q', '').strip()
+
+    # Get all public profiles except the currently logged-in user
+    users = UserDetails.objects.filter(
+        user__is_active=True,
+        profile_visibility='public'
+    ).exclude(user_id=request.session['user_id'])
+
+    # # Search filtering by name or skill
+    # if query:
+    #     users = users.filter(
+    #         Q(name__icontains=query) |
+    #         Q(skills__icontains=query)
+    #     )
+
+    # Optionally, fetch current logged-in user's details
+    try:
+        current_user = UserDetails.objects.get(user_id=request.session['user_id'])
+    except UserDetails.DoesNotExist:
+        current_user = None
+
+    context = {
+        'users': users,
+        'current_user': current_user
+    }
+    return render(request, 'skill_swap_user/index.html', context)
 
 # ---------------- Registration ----------------
 def register_view(request):
@@ -57,7 +89,6 @@ def register_view(request):
         form = RegistrationFormStep1()
 
     return render(request, 'skill_swap_user/register.html', {'form': form})
-
 
 # ---------------- Login ----------------
 def login_view(request):
@@ -223,7 +254,19 @@ def send_swap_request(request, user_id):
     if request.method == 'POST':
         skill_offered = request.POST.get('skill_offered')
         skill_required = request.POST.get('skill_required')
-        message = request.POST.get('message')
+        message = request.POST.get('message', '').strip() or 'No message provided.'
+
+        existing = SwapRequest.objects.filter(
+            sender=sender,
+            receiver=receiver,
+            skill_offered=skill_offered,
+            skill_required=skill_required,
+            status='pending'
+        ).exists()
+
+        if existing:
+            messages.warning(request, "You've already sent this swap request.")
+            return redirect('manage_requests')
 
         if skill_offered not in sender_skills or skill_required not in receiver_skills:
             messages.error(request, "Invalid skill selection.")
@@ -314,7 +357,7 @@ def chat_view(request, swap_id):
 
     return render(request, 'skill_swap_user/chat.html', {
         'form': form,
-        'messages': messages_qs,
+        'chat_messages': messages_qs,
         'swap': swap,
         'current_user': user
     })

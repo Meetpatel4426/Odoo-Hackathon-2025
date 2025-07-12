@@ -1,18 +1,11 @@
-{% block content %}
+{% extends "skill_swap_user/base.html" %} {% load static %} {% block content %}
+<link rel="stylesheet" href="{% static 'skill_swap_user/css/chat.css' %}" />
 <h2>
-  Chat with {{ swap.receiver.name if current_user == swap.sender else
-  swap.sender.name }}
+  Chat with {% if current_user == swap.sender %} {{ swap.receiver.name }} {%
+  else %} {{ swap.sender.name }} {% endif %}
 </h2>
 
-<div
-  id="chat-box"
-  style="
-    border: 1px solid #ccc;
-    padding: 10px;
-    max-height: 300px;
-    overflow-y: scroll;
-  "
->
+<div id="chat-box">
   <p>Loading messages...</p>
 </div>
 
